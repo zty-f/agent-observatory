@@ -72,6 +72,7 @@ test('dashboard uses local assets and does not grant cross-origin reads', async 
 test('serves only public dashboard files', async () => {
   assert.equal((await request('/app.js')).status, 200);
   assert.equal((await request('/.git/config')).status, 404);
+  assert.equal((await request('/src/server.js')).status, 404);
   assert.equal((await request('/PRIVACY.md')).status, 404);
 });
 

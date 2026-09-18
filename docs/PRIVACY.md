@@ -1,6 +1,6 @@
 # 隐私声明
 
-[English](PRIVACY.md) · [简体中文](PRIVACY.zh-CN.md)
+[简体中文](PRIVACY.md) · [English](PRIVACY.en.md)
 
 更新日期：2026-09-18。本声明描述的是 **Agent Observatory 应用本身**；Codex、Claude Code、OpenClaw、Pi、GitHub 和浏览器各有自己的隐私实践。
 
@@ -26,4 +26,4 @@
 
 ## 问题与修订
 
-一般问题可提交[已脱敏的 GitHub Issue](https://github.com/zty-f/agent-observatory/issues/new/choose)。漏洞或敏感报告请使用 [SECURITY.md](SECURITY.md) 中的私密渠道。本声明的变更会记录在仓库中，以上日期标识当前版本。
+一般问题可提交[已脱敏的 GitHub Issue](https://github.com/zty-f/agent-observatory/issues/new/choose)。漏洞或敏感报告请使用 [安全政策](../.github/SECURITY.md) 中的私密渠道。本声明的变更会记录在仓库中，以上日期标识当前版本。

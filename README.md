@@ -2,19 +2,19 @@
 
 [![Checks](https://github.com/zty-f/agent-observatory/actions/workflows/checks.yml/badge.svg)](https://github.com/zty-f/agent-observatory/actions/workflows/checks.yml)
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[简体中文](README.md) · [English](README.en.md)
 
-A local dashboard for finding, reading, and managing coding-agent sessions across Codex, Claude Code, OpenClaw, and Pi.
+一个在本机查看、搜索和管理 Codex、Claude Code、OpenClaw 与 Pi 会话的观察台。
 
-Agent Observatory scans session files on your Mac and groups them by project and agent. It shows recent recorded activity, lets you search conversations, and provides recoverable Trash actions where the agent's state can be handled safely. It does not run agents or call model APIs.
+Agent Observatory 扫描 Mac 上的会话文件，按项目和 Agent 整理，展示最近写入的事件和对话内容。对能够安全处理的会话，它提供可恢复的废纸篓操作。它不会运行 Agent，也不会调用模型 API。
 
-![Agent Observatory dashboard showing synthetic Codex, Claude Code, OpenClaw, and Pi sessions](docs/dashboard-demo.png)
+![使用合成 Codex、Claude Code、OpenClaw 和 Pi 会话展示的 Agent Observatory 页面](docs/images/dashboard-demo.png)
 
-*Demo screenshot with synthetic sessions; no personal history is shown.*
+*演示截图只使用合成会话，没有展示个人历史。*
 
-## Quick start
+## 快速开始
 
-**Requirements:** macOS, Node.js 22 or newer, and at least one supported agent with local sessions. There are no runtime npm dependencies.
+**要求：** macOS、Node.js 22 或更新版本，以及至少一种已在本机保存会话的受支持 Agent。运行时不需要安装 npm 依赖。
 
 ```bash
 git clone https://github.com/zty-f/agent-observatory.git
@@ -22,48 +22,60 @@ cd agent-observatory
 npm start
 ```
 
-Open <http://127.0.0.1:4180>. The server binds to `127.0.0.1`; keep the dashboard on your own machine. It has no user authentication, so do not port-forward it or place it behind a public proxy.
+打开 <http://127.0.0.1:4180>。服务只监听 `127.0.0.1`。页面没有用户登录认证，请不要将端口转发到外网，也不要放在公网反向代理之后。
 
-For a per-user macOS background service, run `./start.sh`; stop that service with `./stop.sh` or the dashboard power button. These scripts target Agent Observatory, not the agent processes. To change the port, use `AGENT_OBSERVATORY_PORT=4181 npm start`.
+要作为 macOS 当前用户的后台服务运行，执行 `./start.sh`；使用 `./stop.sh` 或页面电源按钮停止。脚本只针对观察台进程，不会停止各个 Agent。可以用 `AGENT_OBSERVATORY_PORT=4181 npm start` 更换端口。
 
-## What it does
+## 功能与支持范围
 
-- Search sessions by title, agent, project, path, and message summary; read the recorded conversation locally.
-- Group sessions by detected working directory and show recent JSONL events. “Running” is an inference from recent writes, not a process or provider health check.
-- Archive Codex sessions, move eligible sessions to macOS Trash, restore them (to the original path when available), or explicitly delete Trash entries.
-- Copy `codex resume` and `claude --resume` commands for supported sessions.
-- Refresh the browser view every eight seconds. The interface has light/dark themes and list/grid views.
+- 按标题、Agent、项目、路径和消息摘要搜索，并在本机查看已记录的对话。
+- 按工作目录归类；根据最近的 JSONL 事件推断活动状态。“正在运行”不是进程或模型服务的健康检查。
+- 归档 Codex 会话，将符合条件的会话移入 macOS 废纸篓、恢复（原路径可用时恢复到原位置），或明确删除废纸篓记录。
+- 为受支持的会话复制 `codex resume` 或 `claude --resume` 命令。
+- 浏览器每八秒刷新；支持明暗主题和列表、网格视图。
 
-| Agent | Session source | Trash / restore from this dashboard | Resume command |
+| Agent | 会话来源 | 从观察台移入废纸篓及恢复 | 恢复命令 |
 | --- | --- | --- | --- |
-| Codex | `~/.codex/sessions`, `~/.codex/archived_sessions` | Session file, native index/history, and desktop catalog | Yes |
-| Claude Code | `~/.claude/projects/**/*.jsonl` | Session file | Yes |
-| OpenClaw | `~/.openclaw/agents/**/sessions/*.jsonl` | Unrouted history files only | No |
-| Pi | `~/.pi/agent/sessions/**/*.jsonl` | Session file | No |
+| Codex | `~/.codex/sessions`、`~/.codex/archived_sessions` | 会话文件、原生索引与历史、桌面侧栏目录 | 支持 |
+| Claude Code | `~/.claude/projects/**/*.jsonl` | 会话文件 | 支持 |
+| OpenClaw | `~/.openclaw/agents/**/sessions/*.jsonl` | 仅限未被路由引用的历史文件 | 暂不提供 |
+| Pi | `~/.pi/agent/sessions/**/*.jsonl` | 会话文件 | 暂不提供 |
 
-OpenClaw sessions referenced by a live `sessions.json` route are **blocked from Trash**: moving only their JSONL would leave a broken route. Codex's persistent records are updated by this dashboard, but an already-open ChatGPT/Codex window may keep an in-memory sidebar entry until it is fully quit and reopened. File actions for Claude Code and Pi do not promise immediate refresh of their running clients. See [privacy and data handling](PRIVACY.md) for the full boundary.
+仍被 OpenClaw 的 `sessions.json` 路由引用的会话**不能从页面移入废纸篓**，否则会留下失效入口。观察台会同步 Codex 的持久记录，但已打开的 ChatGPT/Codex 窗口可能暂时保留内存中的侧栏条目，需要完全退出再打开。Claude Code 和 Pi 的文件操作不保证其正在运行的客户端立即刷新。详细边界见[隐私声明](docs/PRIVACY.md)。
 
-For custom Pi locations, set `PI_CODING_AGENT_DIR` (agent directory) or `PI_CODING_AGENT_SESSION_DIR` (session directory); the latter takes precedence.
+如需指定 Pi 的位置，可设置 `PI_CODING_AGENT_DIR`（Agent 目录）或 `PI_CODING_AGENT_SESSION_DIR`（会话目录）；后者优先。
 
-## Safety and privacy
+## 安全与隐私
 
-The dashboard reads local prompts, replies, tool output, timestamps, and paths. Those records may contain secrets. No account, telemetry, cookies, external fonts, or model API calls are built into Agent Observatory. Session data is returned only to the local browser over its local HTTP API. Browser preferences are stored in `localStorage`; Trash metadata and optional Codex snapshots stay on the Mac. The server does not authenticate local users, and deleting an item here does not erase copies held by other software, backups, or an open client's memory.
+页面会读取本机的提示词、回答、工具输出、时间和路径，这些记录可能包含密钥。观察台自身没有账户、遥测、Cookie、外部字体或模型 API 调用。会话内容仅由本机 HTTP 接口传给本机浏览器；界面偏好保存在 `localStorage`，废纸篓索引和可选的 Codex 历史快照保留在本机。服务不认证本机用户；在这里删除会话，也不能清除其他软件、备份或已打开客户端内存里的副本。
 
-Read the [Privacy Notice](PRIVACY.md) ([中文](PRIVACY.zh-CN.md)) and [Security Policy](SECURITY.md) before sharing screenshots, logs, or access to the dashboard. **Never attach raw session files to a public issue.**
+分享截图、日志或页面访问权限前，请阅读[隐私声明](docs/PRIVACY.md)（[English](docs/PRIVACY.en.md)）及[安全政策](.github/SECURITY.md)。**不要把原始会话文件上传到公开 Issue。**
 
-## API and development
+## API 与开发
 
-The local UI uses `GET /api/health`, `/api/agents`, `/api/sessions`, `/api/conversation/:id`, and `POST /api/action`. The server accepts only local Host names and same-origin browser requests. This API is for local integrations; it is not a remotely authenticated service.
+页面使用本地接口：`GET /api/health`、`/api/agents`、`/api/sessions`、`/api/conversation/:id`，以及 `POST /api/action`。服务只接受本机 Host 和同源浏览器请求；接口不是带远程身份认证的服务。
 
 ```bash
 npm test
 npm start
 ```
 
-`npm test` checks the JavaScript syntax and runs focused HTTP privacy/security tests. The app uses Node's built-in HTTP server and browser JavaScript. `server.js` reads session files and performs actions; `app.js` renders the UI; `codex-trash-state.py` snapshots and restores Codex metadata; `start.sh` and `stop.sh` manage the macOS service.
+`npm test` 检查 JavaScript 语法并运行 HTTP 隐私与安全测试。根目录的 `server.js` 是兼容现有后台服务的入口，实际代码位于 `src/`，页面位于 `public/`。
 
-## Contributing and support
+```text
+agent-observatory/
+├── README.md / README.en.md  # 中文首页与英文版
+├── server.js                 # 稳定的服务入口
+├── start.sh / stop.sh        # macOS 后台服务命令
+├── src/                     # 会话读取、操作与 Codex 状态辅助脚本
+├── public/                  # 页面、样式与浏览器脚本
+├── docs/                    # 隐私声明与演示图片
+├── .github/                 # 社区文档、模板和 CI
+└── test/                    # 本地 HTTP 安全测试
+```
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request. Use the [issue templates](https://github.com/zty-f/agent-observatory/issues/new/choose) for bugs and ideas; remove personal paths and session content from examples. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+## 参与贡献与反馈
 
-The project is currently macOS-focused. Agent formats and desktop indexes can change; support for a new agent or a delete/restore path needs evidence from that agent's current format and a round-trip test. See the [license](LICENSE) for reuse terms.
+提交 PR 前请阅读[参与贡献指南](.github/CONTRIBUTING.md)和[社区行为准则](.github/CODE_OF_CONDUCT.md)。反馈问题或建议请使用 [Issue 模板](https://github.com/zty-f/agent-observatory/issues/new/choose)，先删去私人路径和会话内容。安全漏洞请按[安全政策](.github/SECURITY.md)私密报告。
+
+项目目前以 macOS 为主。Agent 的格式及桌面索引可能变化；新增 Agent 支持或删除、恢复流程，需要提供对应格式证据和往返验证。复用条款见 [LICENSE](LICENSE)。

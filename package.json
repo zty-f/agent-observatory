@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "private": true,
   "license": "MIT",
-  "description": "Browse and manage local coding-agent sessions across Codex, Claude Code, OpenClaw, and Pi.",
+  "description": "本机 Coding Agent 会话观察台 | Local session dashboard for Codex, Claude Code, OpenClaw and Pi.",
   "repository": "github:zty-f/agent-observatory",
   "homepage": "https://github.com/zty-f/agent-observatory#readme",
   "bugs": "https://github.com/zty-f/agent-observatory/issues",
@@ -13,6 +13,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node --check server.js && node --check app.js && node --test"
+    "test": "node --check server.js && node --check src/server.js && node --check public/app.js && node --test"
   }
 }

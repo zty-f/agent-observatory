@@ -1,6 +1,6 @@
 # Privacy Notice
 
-[English](PRIVACY.md) · [简体中文](PRIVACY.zh-CN.md)
+[简体中文](PRIVACY.md) · [English](PRIVACY.en.md)
 
 Last updated: 2026-09-18. This notice describes the **Agent Observatory application**, not the separate privacy practices of Codex, Claude Code, OpenClaw, Pi, GitHub, or your browser.
 
@@ -26,4 +26,4 @@ The application page loads its own code and system fonts only. Visiting this Git
 
 ## Questions and changes
 
-For a general question, open a [redacted GitHub issue](https://github.com/zty-f/agent-observatory/issues/new/choose). For a vulnerability or sensitive report, use the private channel in [SECURITY.md](SECURITY.md). Changes to this notice will be committed in the repository; the date above identifies the current version.
+For a general question, open a [redacted GitHub issue](https://github.com/zty-f/agent-observatory/issues/new/choose). For a vulnerability or sensitive report, use the private channel in [SECURITY.md](../.github/SECURITY.en.md). Changes to this notice will be committed in the repository; the date above identifies the current version.

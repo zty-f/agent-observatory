@@ -1,6 +1,6 @@
 # Security Policy
 
-[English](SECURITY.md) · [简体中文](SECURITY.zh-CN.md)
+[简体中文](SECURITY.md) · [English](SECURITY.en.md)
 
 ## Supported versions
 
@@ -14,4 +14,4 @@ For ordinary bugs, use the [public issue templates](https://github.com/zty-f/age
 
 ## Local threat model
 
-Agent Observatory handles sensitive local session text. The HTTP service listens only on `127.0.0.1`, restricts Host and browser Origin values, does not grant cross-origin read access, and serves only the dashboard's public assets. It does **not** authenticate other processes or users on the same computer. Keep the port local; do not publish it through port forwarding, tunnels, or a reverse proxy. Review [PRIVACY.md](PRIVACY.md) for what the app reads and stores.
+Agent Observatory handles sensitive local session text. The HTTP service listens only on `127.0.0.1`, restricts Host and browser Origin values, does not grant cross-origin read access, and serves only the dashboard's public assets. It does **not** authenticate other processes or users on the same computer. Keep the port local; do not publish it through port forwarding, tunnels, or a reverse proxy. Review [PRIVACY.md](../docs/PRIVACY.en.md) for what the app reads and stores.

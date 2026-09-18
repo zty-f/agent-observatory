@@ -1,6 +1,6 @@
 # Contributing
 
-[English](CONTRIBUTING.md) · [简体中文](CONTRIBUTING.zh-CN.md)
+[简体中文](CONTRIBUTING.md) · [English](CONTRIBUTING.en.md)
 
 Thanks for helping improve Agent Observatory. The most useful contributions make session behavior clearer, safer, or easier to verify.
 
@@ -18,6 +18,6 @@ Keep the server bound to loopback and preserve the same-origin and static-file r
 
 ## Pull requests
 
-Make focused changes, describe the user-visible effect and risks, list the commands and real behavior you verified, and link any related issue. The pull request template is a guide. By contributing, you agree that your contribution is distributed under this repository's [license](LICENSE).
+Make focused changes, describe the user-visible effect and risks, list the commands and real behavior you verified, and link any related issue. The pull request template is a guide. By contributing, you agree that your contribution is distributed under this repository's [license](../LICENSE).
 
-For sensitive security findings, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
+For sensitive security findings, follow the [security policy](SECURITY.en.md) instead of opening a public issue.
