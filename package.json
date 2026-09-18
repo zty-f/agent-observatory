@@ -1,11 +1,18 @@
 {
   "name": "agent-observatory",
-  "version": "1.0.0",
-  "description": "A local-first observatory for coding-agent sessions.",
+  "version": "1.0.1",
+  "private": true,
+  "license": "MIT",
+  "description": "Browse and manage local coding-agent sessions across Codex, Claude Code, OpenClaw, and Pi.",
+  "repository": "github:zty-f/agent-observatory",
+  "homepage": "https://github.com/zty-f/agent-observatory#readme",
+  "bugs": "https://github.com/zty-f/agent-observatory/issues",
+  "keywords": ["coding-agents", "codex", "claude-code", "openclaw", "pi-agent", "local-first", "session-management"],
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --check server.js && node --check app.js && node --test"
   }
 }

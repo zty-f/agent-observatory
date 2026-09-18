@@ -417,12 +417,37 @@ function commandFor(session) {
   if (session.agent === 'pi') return '';
   return '';
 }
-function json(res, code, data) { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(data)); }
-function body(req) { return new Promise((resolve, reject) => { let value = ''; req.on('data', (chunk) => value += chunk); req.on('end', () => { try { resolve(value ? JSON.parse(value) : {}); } catch (error) { reject(error); } }); }); }
+function json(res, code, data) { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }
+function body(req) {
+  return new Promise((resolve, reject) => {
+    let value = ''; let bytes = 0; let tooLarge = false;
+    req.on('data', (chunk) => {
+      if (tooLarge) return;
+      bytes += chunk.length;
+      if (bytes > 65536) { tooLarge = true; value = ''; return; }
+      value += chunk;
+    });
+    req.on('end', () => {
+      if (tooLarge) return reject(Object.assign(Error('请求内容过大'), { status: 413 }));
+      try { resolve(value ? JSON.parse(value) : {}); }
+      catch { reject(Object.assign(Error('JSON 格式无效'), { status: 400 })); }
+    });
+    req.on('error', reject);
+  });
+}
 
 const server = http.createServer(async (req, res) => {
   try {
-    if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET,POST,OPTIONS', 'access-control-allow-headers': 'content-type' }); return res.end(); }
+    res.setHeader('cache-control', 'no-store');
+    res.setHeader('x-content-type-options', 'nosniff');
+    res.setHeader('referrer-policy', 'no-referrer');
+    res.setHeader('x-frame-options', 'DENY');
+    res.setHeader('content-security-policy', "default-src 'self'; connect-src 'self'; font-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
+    const host = req.headers.host || '';
+    if (!/^(?:127\.0\.0\.1|localhost)(?::\d{1,5})?$/.test(host)) return json(res, 403, { error: '仅允许本机地址访问' });
+    const origin = req.headers.origin;
+    if (origin && origin !== `http://127.0.0.1:${PORT}` && origin !== `http://localhost:${PORT}`) return json(res, 403, { error: '不允许跨站请求' });
+    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
     const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
     if (url.pathname === '/api/agents') {
       const counts = Object.fromEntries(Object.keys(AGENTS).map((key) => [key, allSessions(key).length]));
@@ -440,6 +465,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/health') return json(res, 200, { ok: true, version: 'multi-agent', agents: Object.fromEntries(Object.keys(AGENTS).map((id) => [id, allSessions(id).length])) });
     if (req.method === 'POST' && url.pathname === '/api/action') {
+      if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) return json(res, 415, { error: '操作接口只接受 JSON 请求' });
       const b = await body(req); const ids = Array.isArray(b.ids) ? [...new Set(b.ids)] : [b.id].filter(Boolean);
       if (b.action === 'stop-service') {
         json(res, 200, { ok: true, stopping: true });
@@ -459,9 +485,10 @@ const server = http.createServer(async (req, res) => {
       else if (!['trash', 'archive', 'unarchive'].includes(b.action)) return json(res, 400, { error: `${session.agentLabel} 暂不支持该操作` });
       return json(res, 200, { ok: true });
     }
-    const file = url.pathname === '/' ? '/index.html' : url.pathname; const target = path.resolve(__dirname, `.${file}`);
-    if (!target.startsWith(path.resolve(__dirname)) || !fs.existsSync(target)) return json(res, 404, { error: '文件不存在' });
+    const file = url.pathname === '/' ? '/index.html' : url.pathname;
+    if (!['/index.html', '/app.js', '/styles.css'].includes(file)) return json(res, 404, { error: '文件不存在' });
+    const target = path.join(__dirname, file);
     const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' }; res.writeHead(200, { 'content-type': types[path.extname(target)] || 'text/plain' }); fs.createReadStream(target).pipe(res);
-  } catch (error) { json(res, 500, { error: error.message }); }
+  } catch (error) { json(res, error.status || 500, { error: error.message }); }
 });
 server.listen(PORT, '127.0.0.1', () => console.log(`Agent Observatory running at http://127.0.0.1:${PORT}`));
