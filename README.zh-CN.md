@@ -8,6 +8,10 @@
 
 Agent Observatory 扫描 Mac 上的会话文件，按项目和 Agent 整理，展示最近写入的事件和对话内容。对能够安全处理的会话，它提供可恢复的废纸篓操作。它不会运行 Agent，也不会调用模型 API。
 
+![使用合成 Codex、Claude Code、OpenClaw 和 Pi 会话展示的 Agent Observatory 页面](docs/dashboard-demo.png)
+
+*演示截图只使用合成会话，没有展示个人历史。*
+
 ## 快速开始
 
 **要求：** macOS、Node.js 22 或更新版本，以及至少一种已在本机保存会话的受支持 Agent。运行时不需要安装 npm 依赖。

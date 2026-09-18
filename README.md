@@ -8,6 +8,10 @@ A local dashboard for finding, reading, and managing coding-agent sessions acros
 
 Agent Observatory scans session files on your Mac and groups them by project and agent. It shows recent recorded activity, lets you search conversations, and provides recoverable Trash actions where the agent's state can be handled safely. It does not run agents or call model APIs.
 
+![Agent Observatory dashboard showing synthetic Codex, Claude Code, OpenClaw, and Pi sessions](docs/dashboard-demo.png)
+
+*Demo screenshot with synthetic sessions; no personal history is shown.*
+
 ## Quick start
 
 **Requirements:** macOS, Node.js 22 or newer, and at least one supported agent with local sessions. There are no runtime npm dependencies.
