@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Observatory</title>
+    <meta name="description" content="A local-first observatory for coding-agent sessions" />
+    <script>document.documentElement.dataset.theme=localStorage.getItem('codex-hub-theme')||'dark';</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">⌬</span><div><strong>Agent Observatory</strong><small>SESSION CONTROL</small></div></div>
+        <div class="local-status"><span></span><div><strong>实时监听在线</strong><small>扫描本机 JSONL 事件</small></div></div>
+        <nav class="nav" aria-label="会话视图">
+          <button class="nav-item active" data-view="overview"><span class="nav-icon">◈</span><span>全部会话</span><b id="nav-count">—</b></button>
+          <button class="nav-item" data-view="projects"><span class="nav-icon">⌘</span><span>项目空间</span><b id="project-count">—</b></button>
+          <div class="nav-divider"></div>
+          <button class="nav-item" data-view="archived"><span class="nav-icon">▣</span><span>已归档</span><b id="archive-count">0</b></button>
+          <button class="nav-item" data-view="trash"><span class="nav-icon">⌫</span><span>系统废纸篓</span><b id="trash-count">0</b></button>
+        </nav>
+        <div class="sidebar-foot"><span class="key-hint">⌘ F</span><span>快速搜索</span></div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="topbar-title"><span class="route-dot"></span><span>本机索引</span><span class="slash">/</span><strong id="view-title">全部会话</strong><span class="sync-label" id="sync-state">等待读取</span></div>
+          <div class="topbar-actions"><span class="host-label">127.0.0.1 · 只在本机运行</span><div class="agent-menu" id="agent-menu"><button class="agent-toggle" id="agent-toggle" aria-haspopup="menu" aria-expanded="false"><span class="agent-toggle-mark">⌬</span><span><small>当前 Agent</small><strong id="active-agent-label">全部 Agent</strong></span><i>⌄</i></button><div class="agent-popover" id="agent-popover" role="menu"></div></div><button class="icon-button theme-toggle" id="theme-toggle" title="切换主题" aria-label="切换主题">☼</button><button class="icon-button" id="refresh-btn" title="刷新数据" aria-label="刷新数据">↻</button><button class="icon-button stop-service" id="stop-service-btn" title="停止 Agent Observatory 服务" aria-label="停止 Agent Observatory 服务">⏻</button></div>
+        </header>
+
+        <div class="content">
+          <section class="command-header">
+            <div>
+              <p class="kicker">SESSION ARCHIVE / <span id="agent-readout">ALL AGENTS</span></p>
+              <h1>把每次协作，<em>变成可监听的工作现场。</em></h1>
+              <p class="lede">按项目、Agent 和时间整理本机会话，同时追踪最新事件：用户发起、Agent 响应、工具执行、回复完成，一眼看清当前进展。</p>
+            </div>
+            <div class="archive-readout"><span class="readout-label">INDEX STATUS</span><strong><i></i> READY</strong><span id="last-sync">--:--:--</span><small>filesystem scan</small></div>
+          </section>
+
+          <section class="overview-strip" aria-label="会话监控概览">
+            <div class="metric"><span>会话总数</span><strong id="stat-total">—</strong><small><i></i><b id="week-count">—</b> 近 7 天</small></div>
+            <div class="metric"><span>项目空间</span><strong id="stat-projects">—</strong><small>按工作目录归类</small></div>
+            <div class="metric"><span>用户消息</span><strong id="stat-messages">—</strong><small>去重后的真实记录</small></div>
+            <div class="metric runtime-metric running"><span>正在运行</span><strong id="stat-running">—</strong><small>正在响应、思考或执行工具</small></div>
+            <div class="metric runtime-metric completed"><span>刚刚完成</span><strong id="stat-just-completed">—</strong><small>最近 8 分钟完成输出</small></div>
+            <div class="metric runtime-metric attention"><span>需要关注</span><strong id="stat-attention">—</strong><small>最近错误或中断</small></div>
+          </section>
+
+          <section class="control-bar">
+            <label class="search-box"><span>⌕</span><input id="search-input" placeholder="搜索标题、项目、路径或消息内容" /><kbd>⌘F</kbd></label>
+            <div class="control-actions">
+              <button class="control-button" id="filter-btn">筛选 <i id="filter-count"></i></button>
+              <select id="sort-select" class="control-select" aria-label="排序"><option value="recent">最近更新</option><option value="oldest">最早更新</option><option value="messages">消息最多</option></select>
+              <button class="mode-button active" data-mode="list" title="列表视图">≡</button>
+              <button class="mode-button" data-mode="grid" title="网格视图">⊞</button>
+            </div>
+          </section>
+          <div class="filter-panel" id="filter-panel">
+            <label>项目<select id="project-filter"><option value="all">全部项目</option></select></label>
+            <label>状态<select id="status-filter"><option value="all">全部状态</option><option value="responding">正在响应</option><option value="just_completed">刚刚完成</option><option value="waiting">等待处理</option><option value="paused">工具阶段</option><option value="attention">需要关注</option><option value="completed">已完成</option><option value="archived">已归档</option></select></label>
+            <label>时间<select id="time-filter"><option value="all">全部时间</option><option value="week">最近 7 天</option><option value="month">最近 30 天</option></select></label>
+            <button class="clear-button" id="clear-filters">清空</button>
+          </div>
+
+          <section class="section-head" id="section-head"><div><span class="section-index">ARCHIVE</span><h2 id="section-title">全部会话</h2><span id="result-count">—</span></div><div class="section-actions"><span class="selection-count" id="selection-count"></span><button class="select-all" id="select-all">选择当前结果</button></div></section>
+          <section class="selection-dock" id="selection-dock" aria-live="polite"><div><span class="dock-signal"></span><strong id="dock-count">0</strong> 个会话已选</div><button id="bulk-trash">⌫ 移到系统废纸篓</button><button class="dock-clear" id="clear-selection">取消选择</button></section>
+          <section class="session-layout">
+            <div class="session-list" id="session-list"></div>
+            <aside class="detail-panel" id="detail-panel">
+              <div class="detail-empty"><div class="empty-mark">⌁</div><h3>选择一个会话</h3><p>从左侧打开会话，查看完整消息和可执行操作。</p></div>
+            </aside>
+          </section>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "agent-observatory",
+  "version": "1.0.0",
+  "description": "A local-first observatory for coding-agent sessions.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
